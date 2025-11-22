@@ -1,0 +1,81 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            bjdgtar8qu2gzt6p3wv7jka5e2wzho1d:
+                codePath: main.py
+                codePathLocal: main.py
+                cpu_count: 14
+                cpu_count_logical: 28
+                cudaVersion: "12.4"
+                disk:
+                    /:
+                        total: "2011876704256"
+                        used: "760973041664"
+                email: mjkmszr0613@gmail.com
+                executable: /home/mjkmszr0613/miniconda3/envs/cp/bin/python
+                git:
+                    commit: 75c4cb8baf55b0723b68a42c53c2bbefd04570b0
+                    remote: https://github.com/Mjk-123/DQN-CartPole.git
+                gpu: NVIDIA GeForce RTX 2080 Ti
+                gpu_count: 4
+                gpu_nvidia:
+                    - architecture: Turing
+                      cudaCores: 4352
+                      memoryTotal: "11811160064"
+                      name: NVIDIA GeForce RTX 2080 Ti
+                      uuid: GPU-35001d68-8af0-b7a9-889a-31a454eb2c08
+                    - architecture: Turing
+                      cudaCores: 4352
+                      memoryTotal: "11811160064"
+                      name: NVIDIA GeForce RTX 2080 Ti
+                      uuid: GPU-fe92eb9a-645b-7b76-949a-ec7f9a1bb8a8
+                    - architecture: Turing
+                      cudaCores: 4352
+                      memoryTotal: "11811160064"
+                      name: NVIDIA GeForce RTX 2080 Ti
+                      uuid: GPU-4a3d3d9e-898c-d504-402a-b12563a97c7e
+                    - architecture: Turing
+                      cudaCores: 4352
+                      memoryTotal: "11811160064"
+                      name: NVIDIA GeForce RTX 2080 Ti
+                      uuid: GPU-e47f069d-24d1-f50e-beaa-a81536fcdcc1
+                host: poscatgpu1
+                memory:
+                    total: "67071262720"
+                os: Linux-6.8.0-62-generic-x86_64-with-glibc2.17
+                program: main.py
+                python: CPython 3.8.20
+                root: /home/mjkmszr0613/POKA_AI/DQN-CartPole
+                startedAt: "2025-11-22T16:54:52.919853Z"
+                writerId: bjdgtar8qu2gzt6p3wv7jka5e2wzho1d
+        m: []
+        python_version: 3.8.20
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 13
+                - 16
+            "4": 3.8.20
+            "5": 0.23.0
+            "12": 0.23.0
+            "13": linux-x86_64
+batch_size:
+    value: 128
+epsilon_decay:
+    value: 0.99
+epsilon_end:
+    value: 0.2
+epsilon_start:
+    value: 1
+gamma:
+    value: 0.9
+lr:
+    value: 0.0025
+max_steps:
+    value: 200
+num_episodes:
+    value: 250
