@@ -2,4 +2,6 @@ checkpoints/
 **/__pycache__/
 wandb/
 
+test.py
+
 .env

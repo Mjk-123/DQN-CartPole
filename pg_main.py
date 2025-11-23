@@ -58,103 +58,115 @@ os.makedirs(ckpt_dir, exist_ok=True)
 input_dim = env.observation_space.shape[0]
 output_dim = env.action_space.n
 
-new_agent = DQNAgent(input_dim, output_dim, seed=170715, lr=lr)
-# new_agent = PolicyGradientAgent(input_dim, output_dim, seed=170715, lr=lr)
+# new_agent = DQNAgent(input_dim, output_dim, seed=170715, lr=lr)
+agent = PolicyGradientAgent(
+    state_size=4,
+    action_size=2,
+    seed=170715,
+    lr=1e-3,
+    gamma=0.99
+)
 
 env = gym.make("CartPole-v1")
+
+agent = PolicyGradientAgent(
+    state_size=4,
+    action_size=2,
+    seed=170715,
+    lr=1e-3,
+    gamma=0.99
+)
+
 num_episodes = 1000
 
 # Training loop
-for episode in range(num_episodes):
+
+for ep in range(num_episodes):
     state = env.reset()
-    epsilon = max(epsilon_end, epsilon_start * (epsilon_decay_rate ** episode))
-    
+    done = False
     episode_reward = 0
-    losses = []
 
-    for step in range(max_steps_per_episode):
-        # action = new_agent.act(state, epsilon)
-        action = new_agent.act(state)
+    while not done:
+        action = agent.act(state)
         next_state, reward, done, _ = env.step(action)
+        agent.store_reward(reward)
 
-        buffer.append((state, action, reward, next_state, done))
-
-        if len(buffer) >= batch_size:
-            batch = random.sample(buffer, batch_size)
-            loss = new_agent.learn(batch, gamma)
-            if loss is not None:
-                losses.append(loss)
-
-        episode_reward += reward
         state = next_state
+        episode_reward += reward
 
-        if done:
-            break
+    loss = agent.update()
 
     # -------------------------------
-    # wandb logging
+    # WandB Logging
     # -------------------------------
     wandb.log({
-        "episode": episode,
+        "episode": ep,
         "reward": episode_reward,
-        "epsilon": epsilon,
-        "loss": sum(losses)/len(losses) if len(losses) > 0 else 0
+        "loss": loss
     })
 
     # -------------------------------
-    # Save checkpoint every N episodes
+    # Save checkpoint every 50 episodes
     # -------------------------------
-    if (episode + 1) % 50 == 0:
-        ckpt_path = f"{ckpt_dir}/dqn_episode_{episode+1}.pth"
+    if (ep + 1) % 50 == 0:
+        ckpt_path = f"{ckpt_dir}/pg_episode_{ep+1}.pth"
         torch.save({
-            "local": new_agent.qnetwork_local.state_dict(),
-            "target": new_agent.qnetwork_target.state_dict()
+            "policy_state_dict": agent.policy.state_dict(),
+            "optimizer_state_dict": agent.optimizer.state_dict()
         }, ckpt_path)
         print(f"Saved checkpoint: {ckpt_path}")
 
-    if (episode + 1) % update_frequency == 0:
-        print(f"Episode {episode + 1}: Finished training")
+    if ep % 10 == 0:
+        print(f"Episode {ep}: reward={episode_reward}, loss={loss:.4f}")
 
 
-# -------------------------------
-# Final checkpoint
-# -------------------------------
-final_ckpt = f"{ckpt_dir}/dqn_final.pth"
+# ------------------------------------------------
+# Save FINAL checkpoint at the end of training
+# ------------------------------------------------
+
+final_ckpt_path = f"{ckpt_dir}/pg_final.pth"
 torch.save({
-    "local": new_agent.qnetwork_local.state_dict(),
-    "target": new_agent.qnetwork_target.state_dict()
-}, ckpt_path)
-print(f"Saved final checkpoint: {final_ckpt}")
+    "policy_state_dict": agent.policy.state_dict(),
+    "optimizer_state_dict": agent.optimizer.state_dict()
+}, final_ckpt_path)
+print(f"Final checkpoint saved to: {final_ckpt_path}")
 
+# ----------------------------------
+# Evaluation (deterministic policy)
+# ----------------------------------
 
-# Evaluation
 test_episodes = 100
 episode_rewards = []
 
-for episode in range(test_episodes):
+for ep in range(test_episodes):
     state = env.reset()
-    episode_reward = 0
     done = False
-    
+    episode_reward = 0
+
     while not done:
-        action = new_agent.act(state, eps=0.0)
+        # evaluation은 deterministic
+        action = agent.act_deterministic(state)
         next_state, reward, done, _ = env.step(action)
         episode_reward += reward
         state = next_state
 
     episode_rewards.append(episode_reward)
 
-average_reward = sum(episode_rewards) / test_episodes
-print(f"Average reward over {test_episodes} test episodes: {average_reward:.2f}")
+avg_reward = sum(episode_rewards) / test_episodes
+print(f"Average reward over {test_episodes} episodes = {avg_reward:.2f}")
 
-# Visualize
+# ----------------------------------
+# Visualization
+# ----------------------------------
+
 state = env.reset()
 done = False
+
 while not done:
     env.render()
-    action = new_agent.act(state, eps=0.0)
+    action = agent.act_deterministic(state)
     next_state, reward, done, _ = env.step(action)
     state = next_state
-    time.sleep(0.1)
+    time.sleep(0.05)
 
 env.close()

@@ -7,7 +7,6 @@ import random
 from collections import namedtuple, deque
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
 
 # Define the neural network model
 class QNetwork(nn.Module):
